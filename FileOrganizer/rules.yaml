@@ -1,0 +1,36 @@
+defaultAction: MOVE
+duplicatePolicy: keep_both_timestamp
+fallback:
+  root: "Unsorted"
+  by: "date"
+
+orderedRules:
+  - name: "Photos by year/month"
+    when:
+      mimePrefix: "image/"
+    then:
+      action: MOVE
+      setDestinationTemplate: "{targetDir}/Photos/{createdAt:yyyy}/{createdAt:yyyy-MM}/{fileName}"
+    continue: false
+
+  - name: "Videos to Media/Videos"
+    when:
+      extensions: ["mp4", "mkv", "mov"]
+    then:
+      setDestinationTemplate: "{targetDir}/Media/Videos/{fileName}"
+    continue: false
+
+  - name: "Documents into type folders"
+    when:
+      extensions: ["pdf", "docx", "xlsx", "pptx"]
+    then:
+      setDestinationTemplate: "{targetDir}/Documents/{extensionUpper}/{fileName}"
+    continue: false
+
+  - name: "Large archives to Archives/Big"
+    when:
+      extensions: ["zip", "rar", "7z"]
+      sizeMin: 104857600   # 100 MB
+    then:
+      setDestinationTemplate: "{targetDir}/Archives/Big/{fileName}"
+    continue: false

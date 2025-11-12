@@ -11,13 +11,18 @@ namespace FileOrganizer
     {
         public string sourceDir;
         public string targetDir;
-        public string rulesFile;
-        public string[] mode = { "one-shot", "watch" }; // Organizes folder once or watches folder and waits for updates
-        public string dryrun;
+        private string rulesFile;
+        //public string dryrun;
 
         public Organizer()
         {
 
+        }
+        public Organizer(string sourceDir, string targetDir, string rulesFile)
+        {
+            this.sourceDir = sourceDir;
+            this.targetDir = targetDir;
+            this.rulesFile = rulesFile;
         }
     }
 }
