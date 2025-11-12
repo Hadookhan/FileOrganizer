@@ -18,15 +18,15 @@ namespace FileOrganizer
             {
                 throw new FileNotFoundException("Path not found.");
             }
-            if (!Directory.Exists(source) || !Directory.Exists(target))
-            {
-                throw new DirectoryNotFoundException("Source or Target directory not found.");
-            }
+            //if (!Directory.Exists(source) || !Directory.Exists(target))
+            //{
+            //    throw new DirectoryNotFoundException("Source or Target directory not found.");
+            //}
 
             object[] meta = GetFileMetaData(path);
         }
 
-        private object[] GetFileMetaData(string path)
+        public object[] GetFileMetaData(string path)
         {
             object[] metaData = new object[5];
 

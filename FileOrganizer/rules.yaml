@@ -7,7 +7,7 @@ fallback:
 orderedRules:
   - name: "Photos by year/month"
     when:
-      mimePrefix: "image/"
+      extensions: [".jpg", ".jpeg", ".png", ".gif", ".webp", ".heic", ".heif", ".tif", ".tiff"]
     then:
       action: MOVE
       setDestinationTemplate: "{targetDir}/Photos/{createdAt:yyyy}/{createdAt:yyyy-MM}/{fileName}"
@@ -15,21 +15,22 @@ orderedRules:
 
   - name: "Videos to Media/Videos"
     when:
-      extensions: ["mp4", "mkv", "mov"]
+      extensions: [".mp4", ".mkv", ".mov"]
     then:
       setDestinationTemplate: "{targetDir}/Media/Videos/{fileName}"
     continue: false
 
   - name: "Documents into type folders"
     when:
-      extensions: ["pdf", "docx", "xlsx", "pptx"]
+      extensions: [".pdf", ".docx", ".xlsx", ".pptx", ".txt", ".md", ".rtf", ".csv", ".log"]
     then:
+      action: MOVE
       setDestinationTemplate: "{targetDir}/Documents/{extensionUpper}/{fileName}"
     continue: false
 
   - name: "Large archives to Archives/Big"
     when:
-      extensions: ["zip", "rar", "7z"]
+      extensions: [".zip", ".rar", ".7z"]
       sizeMin: 104857600   # 100 MB
     then:
       setDestinationTemplate: "{targetDir}/Archives/Big/{fileName}"

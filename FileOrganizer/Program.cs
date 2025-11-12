@@ -21,6 +21,7 @@ namespace FileOrganizer
 
             core.ProcessFile(path, fileOrg.sourceDir, fileOrg.targetDir);
             YamlDocument rulesDoc = rule.LoadRules();
+            rule.DecideAction(path, core.GetFileMetaData(path), rulesDoc, "", "");
         }
     }
 }
