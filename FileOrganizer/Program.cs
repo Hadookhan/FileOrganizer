@@ -14,6 +14,7 @@ namespace FileOrganizer
     {
         static void Main(string[] args)
         {
+
             string rulePath = @"..\..\rules.yaml";
 
             Core core = new Core();
