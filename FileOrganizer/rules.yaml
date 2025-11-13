@@ -38,7 +38,7 @@ orderedRules:
 
   - name: "Executables to Archives/EXE"
     when:
-      extensions: ["exe", "config"]
+      extensions: ["exe"]
     then:
       setDestinationTemplate: "{targetDir}/Archives/{extensionUpper}/{fileName}"
     continue: false
@@ -52,7 +52,7 @@ orderedRules:
     continue: false
   - name: "Other"
     when:
-      extensions: ["pdb", "cache", "dll", "xml"]
+      extensions: ["pdb", "cache", "dll", "xml", "config"]
     then:
       action: MOVE
       setDestinationTemplate: "{targetDir}/Other/{fileName}"
