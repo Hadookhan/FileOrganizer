@@ -9,7 +9,3 @@
 - **MOVE** -> Moves files from source to target.
 - **COPY** -> Copies files from source to target.
 - **DELETE** -> Deletes files from source.
-
-# Downloads
-
-# Source code
