@@ -1,4 +1,4 @@
-defaultAction: MOVE
+﻿defaultAction: SKIP
 duplicatePolicy: keep_both_timestamp
 fallback:
   root: "Unsorted"
@@ -17,6 +17,7 @@ orderedRules:
     when:
       extensions: ["mp4", "mkv", "mov"]
     then:
+      action: MOVE
       setDestinationTemplate: "{targetDir}/Media/Videos/{fileName}"
     continue: false
 
@@ -33,27 +34,37 @@ orderedRules:
       extensions: ["zip", "rar", "7z"]
       sizeMin: 104857600   # 100 MB
     then:
+      action: MOVE
       setDestinationTemplate: "{targetDir}/Archives/Big/{fileName}"
     continue: false
 
   - name: "Executables to Archives/EXE"
     when:
-      extensions: ["exe"]
+      extensions: ["exe", "bat"]
     then:
+      action: MOVE
       setDestinationTemplate: "{targetDir}/Archives/{extensionUpper}/{fileName}"
     continue: false
 
   - name: "Code to Code folder"
     when:
-      extensions: ["py", "ipybn", "go", "c", "cp", "cpp", "cs", "java", "r", "js", "html", "css", "db", "json"]
+      extensions: ["py", "ipybn", "go", "c", "cp", "cpp", "cs", "java", "r", "js", "html", "css", "json", "sln"]
     then:
       action: MOVE
       setDestinationTemplate: "{targetDir}/Code/{extensionUpper}/{fileName}"
     continue: false
+  - name: "Database to Database folder"
+    when:
+      extensions: ["db", "sqlite", "sqlite3"]
+    then:
+      action: MOVE
+      setDestinationTemplate: "{targetDir}/Code/Database/{extensionUpper}/{fileName}"
+    continue: false
   - name: "Other"
     when:
-      extensions: ["pdb", "cache", "dll", "xml", "config"]
+      extensions: ["pdb", "cache", "dll", "xml", "config", "env", "ttf"]
     then:
       action: MOVE
       setDestinationTemplate: "{targetDir}/Other/{fileName}"
     continue: false
+

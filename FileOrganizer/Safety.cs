@@ -100,16 +100,37 @@ namespace FileOrganizer
             File.Delete(path);
         }
 
-        public string EnsureAbsolutePath(string p)
+        public bool TryEnsureAbsolutePath(string input, out string absolute)
         {
-            if (string.IsNullOrWhiteSpace(p)) return p;
+            absolute = string.Empty;
+            if (string.IsNullOrWhiteSpace(input)) return false;
+
+            var p = input.Trim().Trim('"'); // remove accidental quotes
+
+            // quick invalid-char check
+            if (p.IndexOfAny(Path.GetInvalidPathChars()) >= 0) return false;
+
+            // Windows: fix drive-relative like "C:folder" -> "C:\folder"
             if (Path.DirectorySeparatorChar == '\\'
                 && p.Length >= 2 && char.IsLetter(p[0]) && p[1] == ':'
                 && (p.Length == 2 || (p[2] != '\\' && p[2] != '/')))
             {
-                p = p.Insert(2, @"\"); // C:foo -> C:\foo
+                p = p.Insert(2, "\\");
             }
-            return Path.GetFullPath(p);
+
+            // Optional: reject stray ':' beyond the drive letter (e.g., "foo:bar")
+            int colon = p.IndexOf(':');
+            if (Path.DirectorySeparatorChar == '\\' && colon > 1) return false;
+
+            try
+            {
+                absolute = Path.GetFullPath(p); // resolves .. and .
+                return true;
+            }
+            catch
+            {
+                return false; // treat as unsupported/bad path
+            }
         }
 
         public bool IsFullyQualifiedPath(string path)

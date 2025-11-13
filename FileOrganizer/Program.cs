@@ -13,7 +13,7 @@ namespace FileOrganizer
         static void Main(string[] args)
         {
             string rulePath = @"..\..\rules.yaml";
-            string sourceDir = @"C:\Users\had\OneDrive - MMU\Desktop\test";
+            string sourceDir = @"C:\Users\had\OneDrive - MMU\Desktop\Photos";
             string targetDir = @"C:\Users\had\Organised";
 
             if (!Directory.Exists(sourceDir) || !Directory.Exists(targetDir))

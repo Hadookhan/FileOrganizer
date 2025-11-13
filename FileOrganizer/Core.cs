@@ -28,7 +28,11 @@ namespace FileOrganizer
             string dest = actions.Count > 1 ? actions[1] : string.Empty;
 
             string destFinal = s.ResolveConflicts(dest, meta, map["duplicatePolicy"]);
-            destFinal = s.EnsureAbsolutePath(destFinal);
+            if (!s.TryEnsureAbsolutePath(destFinal, out destFinal))
+            {
+                Console.WriteLine($"[SKIP-BADPATH] {destFinal}");
+                return;
+            }
             if (!s.IsFullyQualifiedPath(destFinal))
                 throw new InvalidOperationException($"Destination is not absolute: '{destFinal}'");
 
