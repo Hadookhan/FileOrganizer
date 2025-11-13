@@ -47,10 +47,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core.cs" />
-    <Compile Include="Organizer.cs" />
+    <Compile Include="DestinationContext.cs" />
+    <Compile Include="DestinationInterpolation.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rule.cs" />
+    <Compile Include="Safety.cs" />
+    <Compile Include="Traverse.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

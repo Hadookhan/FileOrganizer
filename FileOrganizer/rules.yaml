@@ -2,12 +2,12 @@ defaultAction: MOVE
 duplicatePolicy: keep_both_timestamp
 fallback:
   root: "Unsorted"
-  by: "date"
+  by: "extension"
 
 orderedRules:
   - name: "Photos by year/month"
     when:
-      extensions: [".jpg", ".jpeg", ".png", ".gif", ".webp", ".heic", ".heif", ".tif", ".tiff"]
+      extensions: ["jpg", "jpeg", "png", "gif", "webp", "heic", "heif", "tif", "tiff"]
     then:
       action: MOVE
       setDestinationTemplate: "{targetDir}/Photos/{createdAt:yyyy}/{createdAt:yyyy-MM}/{fileName}"
@@ -15,14 +15,14 @@ orderedRules:
 
   - name: "Videos to Media/Videos"
     when:
-      extensions: [".mp4", ".mkv", ".mov"]
+      extensions: ["mp4", "mkv", "mov"]
     then:
       setDestinationTemplate: "{targetDir}/Media/Videos/{fileName}"
     continue: false
 
   - name: "Documents into type folders"
     when:
-      extensions: [".pdf", ".docx", ".xlsx", ".pptx", ".txt", ".md", ".rtf", ".csv", ".log"]
+      extensions: ["pdf", "doc", "docx", "xlsx", "ppt", "pptx", "txt", "md", "rtf", "csv", "log"]
     then:
       action: MOVE
       setDestinationTemplate: "{targetDir}/Documents/{extensionUpper}/{fileName}"
@@ -30,8 +30,30 @@ orderedRules:
 
   - name: "Large archives to Archives/Big"
     when:
-      extensions: [".zip", ".rar", ".7z"]
+      extensions: ["zip", "rar", "7z"]
       sizeMin: 104857600   # 100 MB
     then:
       setDestinationTemplate: "{targetDir}/Archives/Big/{fileName}"
+    continue: false
+
+  - name: "Executables to Archives/EXE"
+    when:
+      extensions: ["exe", "config"]
+    then:
+      setDestinationTemplate: "{targetDir}/Archives/{extensionUpper}/{fileName}"
+    continue: false
+
+  - name: "Code to Code folder"
+    when:
+      extensions: ["py", "ipybn", "go", "c", "cp", "cpp", "cs", "java", "r", "js", "html", "css", "db", "json"]
+    then:
+      action: MOVE
+      setDestinationTemplate: "{targetDir}/Code/{extensionUpper}/{fileName}"
+    continue: false
+  - name: "Other"
+    when:
+      extensions: ["pdb", "cache", "dll", "xml"]
+    then:
+      action: MOVE
+      setDestinationTemplate: "{targetDir}/Other/{fileName}"
     continue: false

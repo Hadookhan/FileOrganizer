@@ -12,16 +12,24 @@ namespace FileOrganizer
     {
         static void Main(string[] args)
         {
-            string path = "/Users/had/OneDrive - MMU/Desktop/test/sdfsdf.txt";
-            string rulePath = "../../rules.yaml";
-            Organizer fileOrg = new Organizer();
-            
+            string rulePath = @"..\..\rules.yaml";
+            string sourceDir = @"C:\Users\had\OneDrive - MMU\Desktop\test";
+            string targetDir = @"C:\Users\had\Organised";
+
+            if (!Directory.Exists(sourceDir) || !Directory.Exists(targetDir))
+            {
+                throw new DirectoryNotFoundException("Source or Target directory not found.");
+            }
+
             Core core = new Core();
             Rule rule = new Rule(rulePath);
-
-            core.ProcessFile(path, fileOrg.sourceDir, fileOrg.targetDir);
             YamlDocument rulesDoc = rule.LoadRules();
-            rule.DecideAction(path, core.GetFileMetaData(path), rulesDoc, "", "");
+
+            Traverse DFS = new Traverse();
+            foreach (var path in DFS.EnumerateAllFiles(sourceDir))
+            {
+                core.ProcessFile(path, sourceDir, targetDir, rulesDoc);
+            }
         }
     }
 }

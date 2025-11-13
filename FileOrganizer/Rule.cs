@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
 using YamlDotNet.RepresentationModel;
@@ -30,11 +31,18 @@ namespace FileOrganizer
             }
         }
 
-        public object DecideAction(string path, object[] meta, YamlDocument rules, string sourceDir, string targetDir)
+        public List<string> DecideAction(string path, object[] meta, YamlDocument rules, string sourceDir, string targetDir)
         {
             string destination = "";
             string action = "SKIP";
             object[] context = { path, meta, sourceDir, targetDir };
+
+            var ctx = DestinationContext.FromFile
+                (
+                srcPath: path,
+                sourceDir: sourceDir,
+                targetDir: targetDir
+                );
 
             var mapping = (YamlMappingNode)rules.RootNode;
 
@@ -48,7 +56,7 @@ namespace FileOrganizer
                 var rule = (YamlMappingNode)node;
                 if (Match(rule["when"], context))
                 {
-                    Console.WriteLine(rule["when"]);
+                    //Console.WriteLine(rule["when"]);
                     if (!rule.Children.TryGetValue(new YamlScalarNode("then"), out var thenNode))
                     {
                         continue;
@@ -60,13 +68,15 @@ namespace FileOrganizer
                         if (thenMap.Children.TryGetValue(new YamlScalarNode("action"), out var actionNode))
                         {
                             action = (string)actionNode;
-                            Console.WriteLine(action);
+                            //Console.WriteLine(action);
                         }
 
                         if (thenMap.Children.TryGetValue(new YamlScalarNode("setDestinationTemplate"), out var DestinationTemplateNode))
                         {
-                            destination = $"{DestinationTemplateNode}";
-                            Console.WriteLine(destination);
+                            string template = (string)DestinationTemplateNode;
+                            var renderer = new DestinationInterpolator();
+                            destination = renderer.Render(template, ctx);
+                            //Console.WriteLine(destination);
                         }
 
                         if (thenMap.Children.TryGetValue(new YamlScalarNode("continue"), out var continueNode)){
@@ -76,10 +86,16 @@ namespace FileOrganizer
 
                     }
                 }
-                Console.WriteLine(action);
-                Console.WriteLine(destination);
+
+                if (destination == "")
+                {
+                    destination = DefaultDestination(meta, targetDir, mapping["fallback"]);
+                    action = (string)mapping["defaultAction"];
+                }
+                //Console.WriteLine(action);
+                //Console.WriteLine(destination);
             }
-            return (action, destination);
+            return new List<string> { action, destination };
         }
 
         private bool Match(YamlNode condition, object[] context)
@@ -96,6 +112,14 @@ namespace FileOrganizer
             //Console.WriteLine(extensions);
             //Console.WriteLine(extension);
             return ((YamlSequenceNode)extensions).Contains((YamlNode)extension);
+        }
+
+        private string DefaultDestination(object[] meta, string targetDir, YamlNode fallback)
+        {
+            var sub1 = ((string)fallback["by"] == "extenstion") ? ((string)meta[2]).ToUpperInvariant() : $"{((DateTime)meta[3]).Year}";
+            var sub2 = ((string)fallback["by"] == "date") ? $"{((DateTime)meta[3]).Year}-{((DateTime)meta[3]).Month}" : "";
+
+            return string.Join(targetDir, fallback["root"], sub1, sub2, meta[0]);
         }
     }
 }

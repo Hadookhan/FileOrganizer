@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using YamlDotNet.RepresentationModel;
 
 namespace FileOrganizer
 {
@@ -12,65 +13,75 @@ namespace FileOrganizer
         public Core() { }
 
         //string rules, string dryRun, string logger
-        public void ProcessFile(string path, string source, string target)
+        public void ProcessFile(string path, string sourceDir, string targetDir, YamlDocument rules)
         {
-            if (Directory.Exists(path))
-            {
-                throw new FileNotFoundException("Path not found.");
-            }
-            //if (!Directory.Exists(source) || !Directory.Exists(target))
-            //{
-            //    throw new DirectoryNotFoundException("Source or Target directory not found.");
-            //}
+            if (!File.Exists(path)) throw new FileNotFoundException($"File not found: {path}");
+
+
+            var rule = new Rule("");
+            YamlMappingNode map = (YamlMappingNode)rules.RootNode;
 
             object[] meta = GetFileMetaData(path);
+            List<string> actions = rule.DecideAction(path, meta, rules, sourceDir, targetDir);
+
+            Safety s = new Safety();
+            string dest = actions.Count > 1 ? actions[1] : string.Empty;
+
+            string destFinal = s.ResolveConflicts(dest, meta, map["duplicatePolicy"]);
+            destFinal = s.EnsureAbsolutePath(destFinal);
+            if (!s.IsFullyQualifiedPath(destFinal))
+                throw new InvalidOperationException($"Destination is not absolute: '{destFinal}'");
+
+            if (string.IsNullOrWhiteSpace(destFinal) || destFinal.EndsWith(".SKIP", StringComparison.OrdinalIgnoreCase))
+            {
+                Console.WriteLine($"[SKIP-CONFLICT] {path}");
+                return;
+            }
+
+            var destDir = Path.GetDirectoryName(destFinal);
+            if (!string.IsNullOrEmpty(destDir))
+                Directory.CreateDirectory(destDir);
+
+            Console.WriteLine($@"
+                              SRC   : {path}
+                              DEST  : {destFinal}
+                              ROOT  : {Path.GetPathRoot(destFinal)}
+                              FULL? : {s.IsFullyQualifiedPath(destFinal)}
+                              ");
+
+            switch (actions[0])
+            {
+                case "MOVE":
+                    s.SafeMove(path, destFinal);
+                    break;
+                case "COPY":
+                    s.SafeCopy(path, destFinal);
+                    break;
+                case "DELETE":
+                    s.SafeDelete(path);
+                    break;
+                case "SKIP":
+                    break;
+                default:
+                    throw new ArgumentException("Invalid action.");
+            }
+            Console.WriteLine((actions[0], actions[1]));
+
         }
 
         public object[] GetFileMetaData(string path)
         {
-            object[] metaData = new object[5];
-
-            string name = Path.GetFileName(path);
-            long size = new FileInfo(path).Length;
-            string ext = Path.GetExtension(path);
-            DateTime creationTime = File.GetCreationTime(path);
-
-            metaData[0] = name;
-            metaData[1] = size;
-            metaData[2] = ext;
-            metaData[3] = creationTime;
-
-            return metaData;
-
-            //string[] DMY = creationTime.Date.ToString().Split(' ')[0].Split('/');
-            //int day = 0;
-            //int month = 0;
-            //int year = 0;
-
-
-            //Console.WriteLine(creationTime.Date.ToString().Split(' ')[0]); // Date of creation
-            //Console.WriteLine(creationTime.TimeOfDay); // Time of creation
-
-            //for (int i = 0; i < DMY.Length; i++) // Iterates through Day/Month/Year values
-            //{
-            //    if (i == 0)
-            //    {
-            //        day = int.Parse(DMY[i]);
-            //    }
-            //    else if (i == 1)
-            //    {
-            //        month = int.Parse(DMY[i]);
-            //    }
-            //    else
-            //    {
-            //        year = int.Parse(DMY[i]);
-            //    }
-            //}
-            //Console.WriteLine($"Day: {day}\n" +
-            //                  $"Month: {month}\n" +
-            //                  $"Year: {year}");
-            //Path.GetFileName(path);
-
+            var fi = new FileInfo(path);
+            // Normalize the extension: no dot, lower-case
+            string ext = fi.Extension.TrimStart('.').ToLowerInvariant();
+            return new object[]
+            {
+                fi.Name,                // 0: name
+                fi.Length,              // 1: size
+                ext,                    // 2: extension (normalized)
+                fi.CreationTimeUtc,     // 3: created (UTC)
+                fi.LastWriteTimeUtc     // 4: modified (UTC)
+            };
         }
     }
 }
