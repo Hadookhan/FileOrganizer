@@ -14,7 +14,7 @@ namespace FileOrganizer
 
         public string ResolveConflicts(string dest, object[] meta, YamlNode duplicatePolicyNode)
         {
-            var policy = duplicatePolicyNode.ToString(); // however you read it
+            var policy = duplicatePolicyNode.ToString();
 
             // If no conflict, return dest as-is
             if (!File.Exists(dest)) return dest;
@@ -64,7 +64,7 @@ namespace FileOrganizer
             }
             catch (IOException ex) when (File.Exists(dest))
             {
-                // destination exists → keep both with timestamp (or choose your policy)
+                // destination exists → keep both with timestamp
                 var d = Path.GetDirectoryName(dest);
                 var baseName = Path.GetFileNameWithoutExtension(dest);
                 var ext = Path.GetExtension(dest);
@@ -84,7 +84,7 @@ namespace FileOrganizer
             catch (Exception ex)
             {
                 Console.WriteLine($"[ERROR] SafeMove failed: {ex}");
-                throw; // don’t hide it
+                throw;
             }
         }
 
@@ -105,12 +105,10 @@ namespace FileOrganizer
             absolute = string.Empty;
             if (string.IsNullOrWhiteSpace(input)) return false;
 
-            var p = input.Trim().Trim('"'); // remove accidental quotes
+            var p = input.Trim().Trim('"');
 
-            // quick invalid-char check
             if (p.IndexOfAny(Path.GetInvalidPathChars()) >= 0) return false;
 
-            // Windows: fix drive-relative like "C:folder" -> "C:\folder"
             if (Path.DirectorySeparatorChar == '\\'
                 && p.Length >= 2 && char.IsLetter(p[0]) && p[1] == ':'
                 && (p.Length == 2 || (p[2] != '\\' && p[2] != '/')))
@@ -118,18 +116,17 @@ namespace FileOrganizer
                 p = p.Insert(2, "\\");
             }
 
-            // Optional: reject stray ':' beyond the drive letter (e.g., "foo:bar")
             int colon = p.IndexOf(':');
             if (Path.DirectorySeparatorChar == '\\' && colon > 1) return false;
 
             try
             {
-                absolute = Path.GetFullPath(p); // resolves .. and .
+                absolute = Path.GetFullPath(p);
                 return true;
             }
             catch
             {
-                return false; // treat as unsupported/bad path
+                return false;
             }
         }
 
@@ -140,14 +137,14 @@ namespace FileOrganizer
             // Windows
             if (Path.DirectorySeparatorChar == '\\')
             {
-                // UNC: \\server\share\...
+
                 if (path.StartsWith(@"\\") || path.StartsWith("//")) return true;
 
                 // Drive-rooted: C:\...
                 return path.Length >= 3
                     && char.IsLetter(path[0])
                     && path[1] == ':'
-                    && (path[2] == '\\' || path[2] == '/'); // must have the slash
+                    && (path[2] == '\\' || path[2] == '/');
             }
 
             // Unix/macOS: /...

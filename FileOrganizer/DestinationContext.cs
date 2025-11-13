@@ -10,10 +10,10 @@ namespace FileOrganizer
         public string TargetDir { get; private set; }
         public string FileName { get; private set; }
         public string FileNameNoExt { get; private set; }
-        public string Extension { get; private set; } // without dot, lower
+        public string Extension { get; private set; }
         public long SizeBytes { get; private set; }
-        public DateTime CreatedAt { get; private set; } // UTC
-        public DateTime ModifiedAt { get; private set; } // UTC
+        public DateTime CreatedAt { get; private set; }
+        public DateTime ModifiedAt { get; private set; }
         public string Mime { get; private set; }
 
         public DestinationContext(

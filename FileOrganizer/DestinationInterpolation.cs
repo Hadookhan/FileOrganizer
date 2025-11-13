@@ -51,10 +51,10 @@ namespace FileOrganizer
             var sep = Path.DirectorySeparatorChar;
 
             // --- preserve and FIX the path root ---
-            string rawRoot = Path.GetPathRoot(normalized) ?? string.Empty;  // "C:\" or "C:" or "\\server\share\"
-            bool isBareDrive = rawRoot.Length == 2 && rawRoot[1] == ':';    // e.g., "C:"
-            string root = isBareDrive ? rawRoot + sep : rawRoot;            // ensure "C:\"
-            string remainder = normalized.Substring(rawRoot.Length);        // use RAW length here
+            string rawRoot = Path.GetPathRoot(normalized) ?? string.Empty;
+            bool isBareDrive = rawRoot.Length == 2 && rawRoot[1] == ':'; 
+            string root = isBareDrive ? rawRoot + sep : rawRoot;
+            string remainder = normalized.Substring(rawRoot.Length); 
 
             var cleanedSegments = remainder
                 .Split(new[] { sep }, StringSplitOptions.RemoveEmptyEntries)
