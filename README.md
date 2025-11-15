@@ -10,7 +10,8 @@
 - **COPY** -> Copies files from source to target.
 - **DELETE** -> Deletes files from source.
 
-# [DOWNLOAD](https://github.com/Hadookhan/FileOrganizer/releases/download/v1.0/FileOrganizer.zip)
+# DOWNLOADS
+- [version 1.0](https://github.com/Hadookhan/FileOrganizer/releases/download/v1.0/FileOrganizer.zip)
 
 ## After Download ->
 - Follow path FileOrganizer/bin/debug
