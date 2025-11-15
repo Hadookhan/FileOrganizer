@@ -9,3 +9,9 @@
 - **MOVE** -> Moves files from source to target.
 - **COPY** -> Copies files from source to target.
 - **DELETE** -> Deletes files from source.
+
+# [DOWNLOAD](https://github.com/Hadookhan/FileOrganizer/releases/download/v1.0/FileOrganizer.zip)
+
+## After Download ->
+- Follow path FileOrganizer/bin/debug
+- Run FileOrganizer.exe
